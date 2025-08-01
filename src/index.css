@@ -45,7 +45,7 @@ All colors MUST be HSL.
     /* Stars animation */
     --star-color: hsl(210 40% 98% / 0.8);
 
-    --sidebar-background: 240 12% 10%;
+    --sidebar-background: transparent;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 210 100% 60%;
     --sidebar-primary-foreground: 240 15% 7%;
@@ -84,7 +84,7 @@ All colors MUST be HSL.
     --input: 240 8% 20%;
     --ring: 210 100% 60%;
     
-    --sidebar-background: 240 12% 10%;
+    --sidebar-background: transparent;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 210 100% 60%;
     --sidebar-primary-foreground: 240 15% 7%;

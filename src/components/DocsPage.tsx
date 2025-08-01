@@ -1,7 +1,10 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 import { useState } from "react";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const Sidebar = ({ activeSection, onSectionChange }: { activeSection: string, onSectionChange: (section: string) => void }) => {
   const sections = {
@@ -31,7 +34,7 @@ const Sidebar = ({ activeSection, onSectionChange }: { activeSection: string, on
   };
 
   return (
-    <div className="w-80 bg-card/30 border-r border-border/50 h-screen overflow-y-auto p-6">
+    <div className="w-80 bg-card/30 border-r border-border/50 h-screen overflow-y-auto p-6 pt-12">
       {Object.entries(sections).map(([category, items]) => (
         <div key={category} className="mb-8">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
@@ -59,20 +62,33 @@ const Sidebar = ({ activeSection, onSectionChange }: { activeSection: string, on
 };
 
 const CodeBlock = ({ children, onCopy }: { children: string, onCopy?: () => void }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (copied) return;
+    if (onCopy) {
+      onCopy();
+    }
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  };
+
   return (
     <div className="relative">
-      <pre className="code-block text-sm overflow-x-auto">
-        <code>{children}</code>
-      </pre>
+      <SyntaxHighlighter language="javascript" style={vscDarkPlus} className="code-block text-sm overflow-x-auto">
+        {children}
+      </SyntaxHighlighter>
       {onCopy && (
         <Button
           variant="ghost"
           size="sm"
-          onClick={onCopy}
+          onClick={handleCopy}
           className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
         >
-          <Copy className="w-4 h-4" />
-          Copy
+          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          <span className="ml-2">{copied ? 'Copied!' : 'Copy'}</span>
         </Button>
       )}
     </div>
@@ -80,12 +96,8 @@ const CodeBlock = ({ children, onCopy }: { children: string, onCopy?: () => void
 };
 
 const DocsContent = ({ activeSection }: { activeSection: string }) => {
-  const [copied, setCopied] = useState(false);
-
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   if (activeSection === 'getting-started') {
@@ -1372,11 +1384,63 @@ const DocsPage = () => {
   const [activeSection, setActiveSection] = useState('getting-started');
 
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <main className="flex-1 overflow-y-auto p-8">
-        <DocsContent activeSection={activeSection} />
-      </main>
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950">
+      {/* Animated network pattern background */}
+      <div className="absolute inset-0">
+        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="network" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+              <circle cx="50" cy="50" r="2" fill="rgba(59, 130, 246, 0.3)" className="animate-pulse">
+                <animate attributeName="r" values="1;3;1" dur="4s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="20" cy="20" r="1.5" fill="rgba(168, 85, 247, 0.4)" className="animate-pulse">
+                <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="80" cy="30" r="1" fill="rgba(34, 197, 94, 0.3)">
+                <animate attributeName="r" values="0.5;2;0.5" dur="5s" repeatCount="indefinite" />
+              </circle>
+              <line x1="20" y1="20" x2="50" y2="50" stroke="rgba(59, 130, 246, 0.2)" strokeWidth="0.5">
+                <animate attributeName="opacity" values="0;0.6;0" dur="3s" repeatCount="indefinite" />
+              </line>
+              <line x1="50" y1="50" x2="80" y2="30" stroke="rgba(168, 85, 247, 0.15)" strokeWidth="0.5">
+                <animate attributeName="opacity" values="0.1;0.5;0.1" dur="4s" repeatCount="indefinite" />
+              </line>
+            </pattern>
+            <radialGradient id="glow" cx="50%" cy="50%">
+              <stop offset="0%" stopColor="rgba(59, 130, 246, 0.1)" />
+              <stop offset="100%" stopColor="transparent" />
+            </radialGradient>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#network)" />
+          <rect width="100%" height="100%" fill="url(#glow)" />
+        </svg>
+      </div>
+
+      {/* Floating particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400/60 rounded-full animate-bounce" style={{animationDelay: '0s', animationDuration: '3s'}}></div>
+        <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-purple-400/70 rounded-full animate-bounce" style={{animationDelay: '1s', animationDuration: '4s'}}></div>
+        <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-green-400/50 rounded-full animate-bounce" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
+        <div className="absolute top-1/6 right-1/3 w-1 h-1 bg-cyan-400/60 rounded-full animate-bounce" style={{animationDelay: '0.5s', animationDuration: '3.5s'}}></div>
+        <div className="absolute bottom-1/4 left-1/6 w-2 h-2 bg-blue-300/40 rounded-full animate-bounce" style={{animationDelay: '1.5s', animationDuration: '4.5s'}}></div>
+      </div>
+
+      {/* Dynamic gradient orbs */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-500/30 to-purple-500/20 rounded-full blur-3xl animate-pulse" style={{animationDuration: '4s'}}></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-500/25 to-blue-500/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s', animationDuration: '6s'}}></div>
+        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-gradient-to-bl from-cyan-500/20 to-transparent rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s', animationDuration: '5s'}}></div>
+      </div>
+
+      {/* Overlay for content readability */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-transparent to-slate-950/60" />
+      
+      <div className="relative z-10 flex h-screen bg-transparent">
+        <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+        <main className="flex-1 overflow-y-auto p-8">
+          <DocsContent activeSection={activeSection} />
+        </main>
+      </div>
     </div>
   );
 };
