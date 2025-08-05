@@ -218,7 +218,7 @@ const Hero = () => {
       <div className="relative z-10">
         <div className="min-h-screen flex items-center justify-center text-center px-4 max-w-5xl mx-auto">
             <div>
-                <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
+                <h1 className="text-5xl sm:text-6xl md:text-8xl font-bold mb-8 leading-tight">
                 <span className="text-foreground">The Ultimate</span>
                 <br />
                 <span className="text-foreground">Lavalink</span>
@@ -229,7 +229,7 @@ const Hero = () => {
                 </span>
                 </h1>
                 
-                <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed">
+                <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed">
                 Reimagining audio streaming for Discord. Experience crystal-clear audio with 
                 unmatched stability and industry-leading performance.
                 </p>

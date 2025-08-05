@@ -18,12 +18,12 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center">
-            <span className="text-2xl font-bold">
+          <a href="/" className="flex items-center flex-shrink-0">
+            <span className="text-2xl font-bold whitespace-nowrap">
               <span className="text-foreground">Aqua</span>
               <span className="text-primary">Link</span>
             </span>
-          </div>
+          </a>
 
           {/* Desktop Menu */}
           <div className="hidden md:block">

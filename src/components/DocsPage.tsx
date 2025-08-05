@@ -1,12 +1,12 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { Copy, Check, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-const Sidebar = ({ activeSection, onSectionChange }: { activeSection: string, onSectionChange: (section: string) => void }) => {
+const Sidebar = ({ activeSection, onSectionChange, isOpen, onClose }: { activeSection: string, onSectionChange: (section: string) => void, isOpen: boolean, onClose: () => void }) => {
   const sections = {
     guides: [
       { id: 'getting-started', name: 'Getting Started' },
@@ -33,8 +33,21 @@ const Sidebar = ({ activeSection, onSectionChange }: { activeSection: string, on
     ]
   };
 
+  const handleSectionClick = (sectionId: string) => {
+    onSectionChange(sectionId);
+    onClose();
+  };
+
   return (
-    <div className="w-80 bg-card/30 border-r border-border/50 h-screen overflow-y-auto p-6 pt-12">
+    <div className={`fixed top-0 left-0 z-50 w-72 bg-card/80 backdrop-blur-lg border-r border-border/50 h-full overflow-y-auto p-6 pt-12 transition-transform duration-300 ease-in-out md:sticky md:top-0 md:translate-x-0 md:w-80 md:h-screen md:z-10 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onClose}
+        className="absolute top-4 right-4 md:hidden"
+      >
+        <X className="w-6 h-6" />
+      </Button>
       {Object.entries(sections).map(([category, items]) => (
         <div key={category} className="mb-8">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
@@ -44,10 +57,10 @@ const Sidebar = ({ activeSection, onSectionChange }: { activeSection: string, on
             {items.map((item) => (
               <button
                 key={item.id}
-                onClick={() => onSectionChange(item.id)}
+                onClick={() => handleSectionClick(item.id)}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                   activeSection === item.id
-                    ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                    ? 'bg-primary/10 text-primary font-semibold'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 }`}
               >
@@ -105,7 +118,7 @@ const DocsContent = ({ activeSection }: { activeSection: string }) => {
       <div className="max-w-4xl">
         <h1 className="text-5xl font-bold mb-5 mt-8">Getting Started</h1>
         <p className="text-lg text-muted-foreground mb-12">
-          Welcome to AquaLink! A powerful Discord music bot library built on top of Lavalink.
+          Welcome to the AquaLink documentation. This guide will walk you through the installation process and help you get your first music bot running in minutes. AquaLink is designed for both beginners and experienced developers, offering a powerful yet easy-to-use interface for Lavalink.
         </p>
 
         <section className="mb-12">
@@ -116,7 +129,35 @@ const DocsContent = ({ activeSection }: { activeSection: string }) => {
         </section>
 
         <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-6">Lavalink Setup</h2>
+          <p className="text-muted-foreground mb-4">
+            Before using AquaLink, you need a running Lavalink server. You can download the latest <code>Lavalink.jar</code> from the <a href="https://github.com/lavalink-devs/Lavalink/releases" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">official repository</a>. Create an <code>application.yml</code> file in the same directory with the following content:
+          </p>
+          <CodeBlock onCopy={() => copyToClipboard(`server:
+  port: 2333
+password: "youshallnotpass"
+logging:
+  level:
+    root: INFO
+    lavalink: INFO`)}>
+            {`server:
+  port: 2333
+password: "youshallnotpass"
+logging:
+  level:
+    root: INFO
+    lavalink: INFO`}
+          </CodeBlock>
+          <p className="text-muted-foreground mt-4">
+            Run Lavalink using <code>java -jar Lavalink.jar</code>. For more advanced configurations, refer to the <a href="https://lavalink.dev" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">official Lavalink documentation</a>.
+          </p>
+        </section>
+
+        <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-6">Quick Setup</h2>
+          <p className="text-muted-foreground mb-4">
+            Here's a basic example to get your bot online and connected to Lavalink. Make sure to replace `'YOUR_BOT_TOKEN'` with your actual bot token.
+          </p>
           <CodeBlock onCopy={() => copyToClipboard(`const { Client, GatewayIntentBits } = require('discord.js');
 const { Aqua } = require('aqualink');
 
@@ -138,7 +179,7 @@ client.aqua = new Aqua(client, {
 
 client.on('ready', async () => {
     await client.aqua.init(client.user.id);
-    console.log('Bot is ready!');
+    console.log('Bot is ready and connected to Lavalink!');
 });
 
 client.login('YOUR_BOT_TOKEN');`)}>
@@ -163,7 +204,7 @@ client.aqua = new Aqua(client, {
 
 client.on('ready', async () => {
     await client.aqua.init(client.user.id);
-    console.log('Bot is ready!');
+    console.log('Bot is ready and connected to Lavalink!');
 });
 
 client.login('YOUR_BOT_TOKEN');`}
@@ -219,7 +260,7 @@ client.login('YOUR_BOT_TOKEN');`}
       <div className="max-w-5xl">
         <h1 className="text-4xl font-bold mb-8 mt-12">Initialization</h1>
         <p className="text-lg text-muted-foreground mb-12">
-          Learn how to properly initialize and configure AquaLink in your Discord bot.
+          Proper initialization is key to a stable and reliable music bot. This section covers the essential steps to configure AquaLink and connect it to your Discord bot instance.
         </p>
 
         <section className="mb-12">
@@ -423,11 +464,14 @@ const aqua = new Aqua(client, {
       <div className="max-w-5xl">
         <h1 className="text-4xl font-bold mb-8 mt-12">Player</h1>
         <p className="text-lg text-muted-foreground mb-12">
-          The Player class manages individual guild music players and their state.
+          The Player class is the heart of AquaLink's music functionality. It manages everything related to a single guild's music session, from connection and playback to volume and state.
         </p>
 
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-6">Creating a Player</h2>
+          <p className="text-muted-foreground mb-4">
+            To start using the player, you first need to create a connection. This is typically done when a user runs a play command. If a player already exists for the guild, you can retrieve it using `getPlayer`.
+          </p>
           <CodeBlock onCopy={() => copyToClipboard(`// Create a new player connection
 const player = client.aqua.createConnection({
     guildId: interaction.guild.id,
@@ -437,7 +481,7 @@ const player = client.aqua.createConnection({
     volume: 100
 });
 
-// Get existing player
+// Get an existing player
 const existingPlayer = client.aqua.getPlayer(guildId);`)}>
             {`// Create a new player connection
 const player = client.aqua.createConnection({
@@ -448,7 +492,7 @@ const player = client.aqua.createConnection({
     volume: 100
 });
 
-// Get existing player
+// Get an existing player
 const existingPlayer = client.aqua.getPlayer(guildId);`}
           </CodeBlock>
         </section>
@@ -554,7 +598,7 @@ player.pause(false); // Resume`}
       <div className="max-w-5xl">
         <h1 className="text-4xl font-bold mb-8 mt-12">Queue Class</h1>
         <p className="text-lg text-muted-foreground mb-12">
-          Manage track queues with powerful queue manipulation methods.
+          The Queue class provides a robust set of tools for managing your music queue. You can add, remove, shuffle, and inspect tracks with ease.
         </p>
 
         <section className="mb-10">
@@ -657,7 +701,7 @@ player.pause(false); // Resume`}
       <div className="max-w-5xl">
         <h1 className="text-4xl font-bold mb-8 mt-12">Node Class</h1>
         <p className="text-lg text-muted-foreground mb-12">
-          Manage Lavalink nodes, their connections, and monitor their status.
+          The Node class represents a connection to a Lavalink server. You can manage multiple nodes, monitor their status, and handle failover scenarios.
         </p>
 
         <section className="mb-12">
@@ -721,55 +765,74 @@ player.pause(false); // Resume`}
       <div className="max-w-5xl">
         <h1 className="text-4xl font-bold mb-8 mt-12">Playing Tracks</h1>
         <p className="text-lg text-muted-foreground mb-12">
-          Learn how to play music tracks with AquaLink, from basic playback to advanced features.
+          This section demonstrates how to search for and play tracks. It covers the entire process from handling a user command to getting music playing in a voice channel.
         </p>
 
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Basic Track Playing</h2>
-          <CodeBlock onCopy={() => copyToClipboard(`// Create a player connection
-const player = client.aqua.createConnection({
-    guildId: interaction.guild.id,
-    textChannel: interaction.channel.id,
-    voiceChannel: interaction.member.voice.channel.id,
-    deaf: true
-});
+          <h2 className="text-2xl font-semibold mb-6">Complete Play Command Example</h2>
+          <p className="text-muted-foreground mb-4">
+            This example shows a complete play command for a Discord bot using slash commands.
+          </p>
+          <CodeBlock onCopy={() => copyToClipboard(`client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isCommand() || interaction.commandName !== 'play') return;
 
-// Search for tracks
-const result = await client.aqua.search('Never Gonna Give You Up');
+    const query = interaction.options.getString('query');
+    const member = interaction.member;
 
-if (result.tracks.length > 0) {
-    // Add track to queue
+    if (!member.voice.channel) {
+        return interaction.reply({ content: 'You must be in a voice channel to play music.', ephemeral: true });
+    }
+
+    const player = client.aqua.createConnection({
+        guildId: interaction.guild.id,
+        textChannel: interaction.channel.id,
+        voiceChannel: member.voice.channel.id,
+        deaf: true
+    });
+
+    const result = await client.aqua.search(query);
+
+    if (!result.tracks.length) {
+        return interaction.reply({ content: 'No tracks found.', ephemeral: true });
+    }
+
     player.queue.add(result.tracks[0]);
+    await interaction.reply({ content: \`Added **\${result.tracks[0].title}** to the queue.\` });
 
-    // Start playing
     if (!player.playing && !player.paused) {
         player.play();
     }
+});`)}>
+            {`client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isCommand() || interaction.commandName !== 'play') return;
 
-    console.log(\`Now playing: \${result.tracks[0].title}\`);
-}`)}>
-            {`// Create a player connection
-const player = client.aqua.createConnection({
-    guildId: interaction.guild.id,
-    textChannel: interaction.channel.id,
-    voiceChannel: interaction.member.voice.channel.id,
-    deaf: true
-});
+    const query = interaction.options.getString('query');
+    const member = interaction.member;
 
-// Search for tracks
-const result = await client.aqua.search('Never Gonna Give You Up');
+    if (!member.voice.channel) {
+        return interaction.reply({ content: 'You must be in a voice channel to play music.', ephemeral: true });
+    }
 
-if (result.tracks.length > 0) {
-    // Add track to queue
+    const player = client.aqua.createConnection({
+        guildId: interaction.guild.id,
+        textChannel: interaction.channel.id,
+        voiceChannel: member.voice.channel.id,
+        deaf: true
+    });
+
+    const result = await client.aqua.search(query);
+
+    if (!result.tracks.length) {
+        return interaction.reply({ content: 'No tracks found.', ephemeral: true });
+    }
+
     player.queue.add(result.tracks[0]);
+    await interaction.reply({ content: \`Added **\${result.tracks[0].title}** to the queue.\` });
 
-    // Start playing
     if (!player.playing && !player.paused) {
         player.play();
     }
-
-    console.log(\`Now playing: \${result.tracks[0].title}\`);
-}`}
+});`}
           </CodeBlock>
         </section>
 
@@ -1146,7 +1209,7 @@ player.setEqualizer(bassBoost);`}
       <div className="max-w-5xl">
         <h1 className="text-4xl font-bold mb-8 mt-12">All Events</h1>
         <p className="text-lg text-muted-foreground mb-12">
-          Listen to various events emitted by AquaLink for real-time updates.
+          AquaLink emits a variety of events to keep you informed about the state of your music players and Lavalink nodes. You can listen for these events to build a responsive and interactive bot.
         </p>
 
         <section className="mb-12">
@@ -1382,63 +1445,62 @@ client.login('YOUR_BOT_TOKEN');`}
 
 const DocsPage = () => {
   const [activeSection, setActiveSection] = useState('getting-started');
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950">
-      {/* Animated network pattern background */}
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 text-foreground">
+      {/* Background animations */}
       <div className="absolute inset-0">
         <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="network" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-              <circle cx="50" cy="50" r="2" fill="rgba(59, 130, 246, 0.3)" className="animate-pulse">
-                <animate attributeName="r" values="1;3;1" dur="4s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="20" cy="20" r="1.5" fill="rgba(168, 85, 247, 0.4)" className="animate-pulse">
-                <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="80" cy="30" r="1" fill="rgba(34, 197, 94, 0.3)">
-                <animate attributeName="r" values="0.5;2;0.5" dur="5s" repeatCount="indefinite" />
-              </circle>
-              <line x1="20" y1="20" x2="50" y2="50" stroke="rgba(59, 130, 246, 0.2)" strokeWidth="0.5">
-                <animate attributeName="opacity" values="0;0.6;0" dur="3s" repeatCount="indefinite" />
-              </line>
-              <line x1="50" y1="50" x2="80" y2="30" stroke="rgba(168, 85, 247, 0.15)" strokeWidth="0.5">
-                <animate attributeName="opacity" values="0.1;0.5;0.1" dur="4s" repeatCount="indefinite" />
-              </line>
+              <circle cx="50" cy="50" r="2" fill="rgba(59, 130, 246, 0.3)" className="animate-pulse" style={{ animationDelay: '0s', animationDuration: '4s' }} />
+              <circle cx="20" cy="20" r="1.5" fill="rgba(168, 85, 247, 0.4)" className="animate-pulse" style={{ animationDelay: '1s', animationDuration: '3s' }} />
             </pattern>
-            <radialGradient id="glow" cx="50%" cy="50%">
-              <stop offset="0%" stopColor="rgba(59, 130, 246, 0.1)" />
-              <stop offset="100%" stopColor="transparent" />
-            </radialGradient>
           </defs>
           <rect width="100%" height="100%" fill="url(#network)" />
-          <rect width="100%" height="100%" fill="url(#glow)" />
         </svg>
       </div>
-
-      {/* Floating particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400/60 rounded-full animate-bounce" style={{animationDelay: '0s', animationDuration: '3s'}}></div>
-        <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-purple-400/70 rounded-full animate-bounce" style={{animationDelay: '1s', animationDuration: '4s'}}></div>
-        <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-green-400/50 rounded-full animate-bounce" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
-        <div className="absolute top-1/6 right-1/3 w-1 h-1 bg-cyan-400/60 rounded-full animate-bounce" style={{animationDelay: '0.5s', animationDuration: '3.5s'}}></div>
-        <div className="absolute bottom-1/4 left-1/6 w-2 h-2 bg-blue-300/40 rounded-full animate-bounce" style={{animationDelay: '1.5s', animationDuration: '4.5s'}}></div>
-      </div>
-
-      {/* Dynamic gradient orbs */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-500/30 to-purple-500/20 rounded-full blur-3xl animate-pulse" style={{animationDuration: '4s'}}></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-500/25 to-blue-500/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s', animationDuration: '6s'}}></div>
-        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-gradient-to-bl from-cyan-500/20 to-transparent rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s', animationDuration: '5s'}}></div>
-      </div>
-
-      {/* Overlay for content readability */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-transparent to-slate-950/60" />
+
+      {/* Mobile Header */}
+      <header className="sticky top-0 z-40 md:hidden flex items-center justify-between h-16 px-4 bg-background/80 backdrop-blur-md border-b border-border/50">
+        <a href="/" className="flex items-center">
+          <span className="text-2xl font-bold whitespace-nowrap">
+            <span className="text-foreground">Aqua</span>
+            <span className="text-primary">Link</span>
+          </span>
+        </a>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu className="w-6 h-6" />
+        </Button>
+      </header>
       
-      <div className="relative z-10 flex h-screen bg-transparent">
-        <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-        <main className="flex-1 overflow-y-auto p-8">
-          <DocsContent activeSection={activeSection} />
+      <div className="relative z-10 flex bg-transparent">
+        <Sidebar 
+          activeSection={activeSection} 
+          onSectionChange={setActiveSection}
+          isOpen={isSidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+          <div className="max-w-full md:max-w-5xl mx-auto">
+            <DocsContent activeSection={activeSection} />
+          </div>
         </main>
       </div>
     </div>
